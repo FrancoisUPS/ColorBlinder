@@ -42,7 +42,7 @@ public class LineActivity extends Activity {
     private int[] colors;
     private Random random = new Random();
 
-    private static final String[] WIN_MESSAGE = {"Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s"};
+    private static final String[] WIN_MESSAGE = {"Pffrrrt, you did %1$s", "Aim for the sky and try to reach %2$s","Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s"};
 
     private static final String BASE_PATH = "ColorBlinder/photos/";
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
