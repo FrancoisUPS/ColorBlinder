@@ -29,3 +29,7 @@ proguard/
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
+
+.directory
+.idea/gradle.xml
+.idea/misc.xml
