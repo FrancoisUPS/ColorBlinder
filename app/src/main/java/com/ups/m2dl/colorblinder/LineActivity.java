@@ -62,8 +62,6 @@ public class LineActivity extends Activity implements View.OnTouchListener {
 
     private Uri imageUri;
     public static final String CST_IMGURI = "uri";
-    private static final String BASE_PATH = "Colorblinder/photos/";
-    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private float upx, upy, downx, downy;
     private Canvas lineCanvas;
 
@@ -80,7 +78,7 @@ public class LineActivity extends Activity implements View.OnTouchListener {
 
                     ImageView imgView = (ImageView) findViewById(R.id.imageView);
 
-//                    imgView.setImageURI(imageUri);
+                    imgView.setImageURI(imageUri);
                     imgView.setOnTouchListener(this);
 
                     //Create a new image bitmap and attach a brand new canvas to it

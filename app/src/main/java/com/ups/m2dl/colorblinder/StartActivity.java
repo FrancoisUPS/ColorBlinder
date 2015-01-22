@@ -36,7 +36,8 @@ public class StartActivity extends ActionBarActivity {
     }
 
     public void takePhoto() {
-        String storageDirectory = BASE_PATH + new Timestamp(new Date().getTime()) + ".jpg";
+        String timestamp = String.valueOf(System.currentTimeMillis()/1000);
+        String storageDirectory = BASE_PATH + timestamp + ".jpg";
 
         File photo = new File(Environment.getExternalStorageDirectory(), storageDirectory);
         photo.getParentFile().mkdirs();
@@ -58,7 +59,6 @@ public class StartActivity extends ActionBarActivity {
                 Uri selectedImage = imageUri;
                 getContentResolver().notifyChange(selectedImage, null);
                 ContentResolver cr = getContentResolver();
-                Bitmap bitmap;
                 try {
                     Intent intent = new Intent(this, LineActivity.class);
                     intent.putExtra(LineActivity.CST_IMGURI, imageUri);
