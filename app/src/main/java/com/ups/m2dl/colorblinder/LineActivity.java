@@ -39,7 +39,7 @@ public class LineActivity extends Activity {
     private int maxScore = 0;
     private MediaPlayer mp;
 
-    private static final String[] WIN_MESSAGE = {"Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s" };
+    private static final String[] WIN_MESSAGE = {"Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s"};
 
     private static final String BASE_PATH = "ColorBlinder/photos/";
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
@@ -61,13 +61,13 @@ public class LineActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 drawImage();
             }
         }
     }
+
     protected void drawImage() {
         getContentResolver().notifyChange(imageUri, null);
         ContentResolver cr = getContentResolver();
@@ -109,16 +109,16 @@ public class LineActivity extends Activity {
 
                             String message = "";
                             int score = colorsPassed.size();
-                            if(score > maxScore) {
+                            if (score > maxScore) {
                                 message = "You beat the best score with a marvelous %1$s";
                                 maxScore = score;
                             } else {
-                                int result = Math.round(( score / maxScore ) * WIN_MESSAGE.length);
+                                int result = Math.round((score / maxScore) * WIN_MESSAGE.length);
                                 Log.d("score ", String.valueOf(result));
-                                if(result < 0)
+                                if (result < 0)
                                     result = 0;
 
-                                if(result >= WIN_MESSAGE.length)
+                                if (result >= WIN_MESSAGE.length)
                                     result = WIN_MESSAGE.length - 1;
 
                                 message = WIN_MESSAGE[result];
@@ -152,7 +152,7 @@ public class LineActivity extends Activity {
             imgView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
 
         } catch (IOException e) {
-            Log.d("test", e.toString(), e);
+            Log.d("drawImage", e.toString(), e);
         }
     }
 
