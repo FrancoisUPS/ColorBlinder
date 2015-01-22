@@ -22,7 +22,7 @@ import java.util.Date;
 
 
 public class StartActivity extends ActionBarActivity {
-    private static final String BASE_PATH = "Colorblinder/photos/";
+    private static final String BASE_PATH = "ColorBlinder/photos/";
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
     private Uri imageUri;
 
@@ -56,18 +56,10 @@ public class StartActivity extends ActionBarActivity {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
 
-                Uri selectedImage = imageUri;
-                getContentResolver().notifyChange(selectedImage, null);
-                ContentResolver cr = getContentResolver();
-                try {
                     Intent intent = new Intent(this, LineActivity.class);
                     intent.putExtra(LineActivity.CST_IMGURI, imageUri);
-                    startActivity(intent);
 
-                } catch (Exception e) {
-                    Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
-                    Log.e("Camera", e.toString());
-                }
+                    startActivity(intent);
             }
         }
     }

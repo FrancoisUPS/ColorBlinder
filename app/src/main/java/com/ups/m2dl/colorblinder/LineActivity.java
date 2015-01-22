@@ -1,7 +1,5 @@
 package com.ups.m2dl.colorblinder;
 
-import com.ups.m2dl.colorblinder.util.SystemUiHider;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -13,7 +11,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -22,7 +19,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.File;
+import com.ups.m2dl.colorblinder.util.SystemUiHider;
+
+import java.io.IOException;
 
 
 /**
@@ -67,34 +66,35 @@ public class LineActivity extends Activity implements View.OnTouchListener {
 
 
     protected void drawImage() {
-                Uri selectedImage = imageUri;
-                getContentResolver().notifyChange(selectedImage, null);
-                ContentResolver cr = getContentResolver();
-                Bitmap bitmap;
-                try {
-                    bitmap = MediaStore.Images.Media.getBitmap(cr, selectedImage);
+        getContentResolver().notifyChange(imageUri, null);
+        ContentResolver cr = getContentResolver();
 
-                    Toast.makeText(this, selectedImage.toString(), Toast.LENGTH_LONG).show();
+        Bitmap bitmap;
 
-                    ImageView imgView = (ImageView) findViewById(R.id.imageView);
+        try {
+            Log.d("uri",imageUri.toString());
 
-                    imgView.setImageURI(imageUri);
-                    imgView.setOnTouchListener(this);
+            bitmap = MediaStore.Images.Media.getBitmap(cr, imageUri);
 
-                    //Create a new image bitmap and attach a brand new canvas to it
-                    Bitmap tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
-                    lineCanvas = new Canvas(tempBitmap);
+            Toast.makeText(this, imageUri.toString(), Toast.LENGTH_LONG).show();
 
-                    //Draw the image b itmap into the cavas
-                    lineCanvas.drawBitmap(bitmap, 0, 0, null);
+            ImageView imgView = (ImageView) findViewById(R.id.imageView);
 
-                    //Attach the canvas to the ImageView
-                    imgView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+            imgView.setImageURI(imageUri);
+            imgView.setOnTouchListener(this);
 
-                } catch (Exception e) {
-                    Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
-                    Log.e("Camera", e.toString());
-                }
+            //Create a new image bitmap and attach a brand new canvas to it
+            Bitmap tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
+            lineCanvas = new Canvas(tempBitmap);
+
+            //Draw the image b itmap into the cavas
+            lineCanvas.drawBitmap(bitmap, 0, 0, null);
+
+            //Attach the canvas to the ImageView
+            imgView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+        } catch (IOException e) {
+            Log.d("test",e.toString(),e);
+        }
     }
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,8 +160,8 @@ public class LineActivity extends Activity implements View.OnTouchListener {
         });
 
         Intent intent = getIntent();
-
         imageUri = intent.getParcelableExtra(CST_IMGURI);
+
         drawImage();
 
         // Upon interacting with UI controls, delay any scheduled hide()
@@ -239,44 +239,48 @@ public class LineActivity extends Activity implements View.OnTouchListener {
     }
 
     //http://tech-algorithm.com/articles/drawing-line-using-bresenham-algorithm/
-    private int[][] line(int x,int y,int x2, int y2) {
+    private int[][] line(int x, int y, int x2, int y2) {
 
-        int w = x2 - x ;
-        int h = y2 - y ;
+        int w = x2 - x;
+        int h = y2 - y;
 
-        int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0 ;
+        int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
 
-        if (w<0) dx1 = -1 ; else if (w>0) dx1 = 1 ;
-        if (h<0) dy1 = -1 ; else if (h>0) dy1 = 1 ;
-        if (w<0) dx2 = -1 ; else if (w>0) dx2 = 1 ;
+        if (w < 0) dx1 = -1;
+        else if (w > 0) dx1 = 1;
+        if (h < 0) dy1 = -1;
+        else if (h > 0) dy1 = 1;
+        if (w < 0) dx2 = -1;
+        else if (w > 0) dx2 = 1;
 
-        int longest = Math.abs(w) ;
-        int shortest = Math.abs(h) ;
+        int longest = Math.abs(w);
+        int shortest = Math.abs(h);
 
-        if (!(longest>shortest)) {
-            longest = Math.abs(h) ;
-            shortest = Math.abs(w) ;
-            if (h<0) dy2 = -1 ; else if (h>0) dy2 = 1 ;
-            dx2 = 0 ;
+        if (!(longest > shortest)) {
+            longest = Math.abs(h);
+            shortest = Math.abs(w);
+            if (h < 0) dy2 = -1;
+            else if (h > 0) dy2 = 1;
+            dx2 = 0;
         }
 
-        int numerator = longest >> 1 ;
+        int numerator = longest >> 1;
 
         int[][] pixels = new int[2][longest];
 
-        for (int i=0;i<=longest;i++) {
+        for (int i = 0; i <= longest; i++) {
 
             pixels[0][i] = x;
             pixels[1][i] = y;
 
-            numerator += shortest ;
-            if (!(numerator<longest)) {
-                numerator -= longest ;
-                x += dx1 ;
-                y += dy1 ;
+            numerator += shortest;
+            if (!(numerator < longest)) {
+                numerator -= longest;
+                x += dx1;
+                y += dy1;
             } else {
-                x += dx2 ;
-                y += dy2 ;
+                x += dx2;
+                y += dy2;
             }
         }
 
