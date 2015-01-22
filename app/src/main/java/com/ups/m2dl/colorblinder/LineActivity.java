@@ -25,6 +25,8 @@ import android.widget.Toast;
 import com.thirdparty.color.ColorDifference;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class LineActivity extends Activity {
@@ -69,31 +71,17 @@ public class LineActivity extends Activity {
                             lineCanvas.drawLine(downx, downy, upx, upy, paint);
                             pixelsP1 = line((int) downx, (int) downy, (int) upx, (int) upy);
 
-                            int nbColors = 0;
-                            int[] previousP = pixelsP1[0];
+                            ((ImageView) findViewById(R.id.imageView)).invalidate();
+                            
+                            Set<Integer> colorsPassed = new HashSet<Integer>();
                             for (int[] pixelCo : pixelsP1)
                             {
                                 int pixel = bitmap.getPixel(pixelCo[0],pixelCo[1]);
-                                int previousPixel = bitmap.getPixel(previousP[0], previousP[1]);
-
-                                int redValue = Color.red(pixel);
-                                int blueValue = Color.blue(pixel);
-                                int greenValue = Color.green(pixel);
-
-                                int previousRedValue = Color.red(previousPixel);
-                                int previousBlueValue = Color.blue(previousPixel);
-                                int previousGreenValue = Color.green(previousPixel);
-
-                                double diff = ColorDifference.findDifference(previousRedValue, previousGreenValue, previousBlueValue, redValue, greenValue, blueValue);
-                                if(diff > SEUIL_COLOR_DIFF * MAX_COLOR_DIFF)
-                                    nbColors++;
-
-                                previousP = pixelCo;
+                                colorsPassed.add(pixel);
                             }
 
-                            Toast.makeText(LineActivity.this, "You did " + nbColors, Toast.LENGTH_LONG).show();
+                            Toast.makeText(LineActivity.this, "You did " + colorsPassed.size(), Toast.LENGTH_LONG).show();
 
-                            ((ImageView) findViewById(R.id.imageView)).invalidate();
                             break;
                         case MotionEvent.ACTION_CANCEL:
                             break;
