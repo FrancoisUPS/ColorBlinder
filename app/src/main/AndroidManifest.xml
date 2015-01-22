@@ -11,15 +11,9 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".StartActivity"
-            android:label="@string/app_name" >
-
-        </activity>
-        <activity
             android:name=".LineActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_line"
-            android:theme="@style/FullscreenTheme" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
