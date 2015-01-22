@@ -7,6 +7,9 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,8 +23,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.net.URI;
-import java.util.Calendar;
 
 
 /**
@@ -60,64 +61,44 @@ public class LineActivity extends Activity implements View.OnTouchListener {
     private SystemUiHider mSystemUiHider;
 
     private Uri imageUri;
+    public static final String CST_IMGURI = "uri";
     private static final String BASE_PATH = "Colorblinder/photos/";
     private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+    private float upx, upy, downx, downy;
+    private Canvas lineCanvas;
 
-    public void takePhoto() {
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
 
-        String storageDirectory = BASE_PATH + System.currentTimeMillis() + ".jpg";
-        File photo = new File(Environment.getExternalStorageDirectory(), storageDirectory);
-        photo.getParentFile().mkdirs();
-
-        imageUri = Uri.fromFile(photo);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
-
-        startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-
+    protected void drawImage() {
                 Uri selectedImage = imageUri;
                 getContentResolver().notifyChange(selectedImage, null);
                 ContentResolver cr = getContentResolver();
                 Bitmap bitmap;
                 try {
-                    bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, selectedImage);
+                    bitmap = MediaStore.Images.Media.getBitmap(cr, selectedImage);
 
                     Toast.makeText(this, selectedImage.toString(), Toast.LENGTH_LONG).show();
 
-                    bitmap.getWidth();
-                    bitmap.getHeight();
-
                     ImageView imgView = (ImageView) findViewById(R.id.imageView);
 
-                    imgView.setImageURI(imageUri);
+//                    imgView.setImageURI(imageUri);
                     imgView.setOnTouchListener(this);
 
                     //Create a new image bitmap and attach a brand new canvas to it
-                    Bitmap tempBitmap = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.RGB_565);
-                    Canvas tempCanvas = new Canvas(tempBitmap);
+                    Bitmap tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
+                    lineCanvas = new Canvas(tempBitmap);
 
-                    //Draw the image b  itmap into the cavas
-                    tempCanvas.drawBitmap(myBitmap, 0, 0, null);
-
-                    //Draw everything else you want into the canvas, in this example a rectangle with rounded edges
-                    tempCanvas.drawRoundRect(new RectF(x1,y1,x2,y2), 2, 2, myPaint);
+                    //Draw the image b itmap into the cavas
+                    lineCanvas.drawBitmap(bitmap, 0, 0, null);
 
                     //Attach the canvas to the ImageView
-                    myImageView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
+                    imgView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
 
                 } catch (Exception e) {
                     Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
                     Log.e("Camera", e.toString());
                 }
-            }
-        }
     }
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -180,10 +161,15 @@ public class LineActivity extends Activity implements View.OnTouchListener {
             }
         });
 
+        Intent intent = getIntent();
+
+        imageUri = intent.getParcelableExtra(CST_IMGURI);
+        drawImage();
+
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+//        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
     }
 
     @Override
@@ -232,6 +218,7 @@ public class LineActivity extends Activity implements View.OnTouchListener {
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int action = event.getAction();
+        Paint paint = new Paint();
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 downx = event.getX();
@@ -242,8 +229,8 @@ public class LineActivity extends Activity implements View.OnTouchListener {
             case MotionEvent.ACTION_UP:
                 upx = event.getX();
                 upy = event.getY();
-                canvas.drawLine(downx, downy, upx, upy, paint);
-                imageView.invalidate();
+                lineCanvas.drawLine(downx, downy, upx, upy, paint);
+                ((ImageView) findViewById(R.id.imageView)).invalidate();
                 break;
             case MotionEvent.ACTION_CANCEL:
                 break;
@@ -251,8 +238,8 @@ public class LineActivity extends Activity implements View.OnTouchListener {
                 break;
         }
         return true;
+    }
 
-        return true;
     //http://tech-algorithm.com/articles/drawing-line-using-bresenham-algorithm/
     private int[][] line(int x,int y,int x2, int y2) {
 
