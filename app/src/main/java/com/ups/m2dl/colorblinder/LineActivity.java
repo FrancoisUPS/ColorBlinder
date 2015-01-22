@@ -35,7 +35,7 @@ public class LineActivity extends Activity {
     private int[][] pixelsP1;
     private int maxScore = 0;
 
-    private static final String[] WIN_MESSAGE = {"Well, your $s is nothing near the amazing $b your friend has scored", "Not bad, but your $s still doesn't beat the best score of $b", "So close! You almost beat the best with a $s" };
+    private static final String[] WIN_MESSAGE = {"Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s" };
 
     protected void drawImage() {
         getContentResolver().notifyChange(imageUri, null);
@@ -79,7 +79,7 @@ public class LineActivity extends Activity {
                             String message = "";
                             int score = colorsPassed.size();
                             if(score > maxScore) {
-                                message = "You beat the best score with a marvelous %1";
+                                message = "You beat the best score with a marvelous %1$s";
                                 maxScore = score;
                             } else {
                                 int result = Math.round(( score / maxScore ) * WIN_MESSAGE.length);
@@ -93,7 +93,6 @@ public class LineActivity extends Activity {
                                 message = WIN_MESSAGE[result];
                             }
                             message = String.format(message, score, maxScore);
-//                            message = message.replaceAll("\$b", String.valueOf(maxScore));
                             Toast.makeText(LineActivity.this, message, Toast.LENGTH_LONG).show();
 
                             break;
