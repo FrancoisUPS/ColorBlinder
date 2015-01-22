@@ -28,16 +28,14 @@ import java.util.Set;
 
 
 public class LineActivity extends Activity {
-    static final double MAX_COLOR_DIFF = 6;
-    static final double SEUIL_COLOR_DIFF = 0.2;
-
     private Uri imageUri;
     public static final String CST_IMGURI = "uri";
     private float upx, upy, downx, downy;
     private Canvas lineCanvas;
-
     private int[][] pixelsP1;
-    private int[][] pixelsP2;
+    private int maxScore = 0;
+
+    private static final String[] WIN_MESSAGE = {"Well, your $s is nothing near the amazing $b your friend has scored", "Not bad, but your $s still doesn't beat the best score of $b", "So close! You almost beat the best with a $s" };
 
     protected void drawImage() {
         getContentResolver().notifyChange(imageUri, null);
@@ -45,7 +43,6 @@ public class LineActivity extends Activity {
 
         final Bitmap bitmap;
         try {
-
             bitmap = MediaStore.Images.Media.getBitmap(cr, imageUri);
 
             ImageView imgView = (ImageView) findViewById(R.id.imageView);
@@ -79,7 +76,25 @@ public class LineActivity extends Activity {
                                 }
                             }
 
-                            Toast.makeText(LineActivity.this, "You did " + colorsPassed.size(), Toast.LENGTH_LONG).show();
+                            String message = "";
+                            int score = colorsPassed.size();
+                            if(score > maxScore) {
+                                message = "You beat the best score with a marvelous %1";
+                                maxScore = score;
+                            } else {
+                                int result = Math.round(( score / maxScore ) * WIN_MESSAGE.length);
+                                Log.d("score ", String.valueOf(result));
+                                if(result < 0)
+                                    result = 0;
+
+                                if(result >= WIN_MESSAGE.length)
+                                    result = WIN_MESSAGE.length - 1;
+
+                                message = WIN_MESSAGE[result];
+                            }
+                            message = String.format(message, score, maxScore);
+//                            message = message.replaceAll("\$b", String.valueOf(maxScore));
+                            Toast.makeText(LineActivity.this, message, Toast.LENGTH_LONG).show();
 
                             break;
                         case MotionEvent.ACTION_CANCEL:
