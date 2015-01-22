@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -36,6 +37,7 @@ public class LineActivity extends Activity {
     private Canvas lineCanvas;
     private int[][] pixelsP1;
     private int maxScore = 0;
+    private MediaPlayer mp;
 
     private static final String[] WIN_MESSAGE = {"Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s" };
 
@@ -158,10 +160,28 @@ public class LineActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mp = MediaPlayer.create(this, R.raw.background);
+        mp.setLooping(true);
+        mp.start();
+
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_line);
 
         takePhoto();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mp.pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mp.start();
     }
 
     //http://tech-algorithm.com/articles/drawing-line-using-bresenham-algorithm/
