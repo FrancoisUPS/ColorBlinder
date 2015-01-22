@@ -27,6 +27,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 
@@ -39,7 +40,7 @@ public class LineActivity extends Activity {
     private int maxScore = 0;
     private MediaPlayer mp;
     private int[] colors;
-    private int currentColor = 0;
+    private Random random = new Random();
 
     private static final String[] WIN_MESSAGE = {"Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s"};
 
@@ -84,7 +85,7 @@ public class LineActivity extends Activity {
                 public boolean onTouch(View v, MotionEvent event) {
                     int action = event.getAction();
                     Paint paint = new Paint();
-                    paint.setColor(getCurrentColor());
+                    paint.setColor(colors[random.nextInt(colors.length)]);
                     paint.setStrokeWidth(10);
                     switch (action) {
                         case MotionEvent.ACTION_DOWN:
@@ -126,7 +127,7 @@ public class LineActivity extends Activity {
                                 message = WIN_MESSAGE[result];
                             }
                             message = String.format(message, score, maxScore);
-                            Toast.makeText(LineActivity.this, message, Toast.LENGTH_LONG).show();
+                            Toast.makeText(LineActivity.this, message, Toast.LENGTH_SHORT).show();
 
                             break;
                         case MotionEvent.ACTION_CANCEL:
@@ -195,9 +196,6 @@ public class LineActivity extends Activity {
         mp.start();
     }
 
-    private int getCurrentColor() {
-        return colors[(int)Math.random() % colors.length];
-    }
 
     //http://tech-algorithm.com/articles/drawing-line-using-bresenham-algorithm/
     private int[][] line(int x, int y, int x2, int y2) {
