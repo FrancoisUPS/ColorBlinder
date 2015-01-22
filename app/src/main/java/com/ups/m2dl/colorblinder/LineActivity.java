@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
@@ -22,6 +23,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -37,6 +39,33 @@ public class LineActivity extends Activity {
 
     private static final String[] WIN_MESSAGE = {"Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s" };
 
+    private static final String BASE_PATH = "ColorBlinder/photos/";
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+
+    public void takePhoto() {
+        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
+        String storageDirectory = BASE_PATH + timestamp + ".jpg";
+
+        File photo = new File(Environment.getExternalStorageDirectory(), storageDirectory);
+        photo.getParentFile().mkdirs();
+
+        imageUri = Uri.fromFile(photo);
+
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+
+        startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Toast.makeText(this, "Failed to load", Toast.LENGTH_SHORT).show();
+        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                drawImage();
+            }
+        }
+    }
     protected void drawImage() {
         getContentResolver().notifyChange(imageUri, null);
         ContentResolver cr = getContentResolver();
@@ -130,13 +159,9 @@ public class LineActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         setContentView(R.layout.activity_line);
 
-        Intent intent = getIntent();
-        imageUri = intent.getParcelableExtra(CST_IMGURI);
-
-        drawImage();
+        takePhoto();
     }
 
     //http://tech-algorithm.com/articles/drawing-line-using-bresenham-algorithm/
