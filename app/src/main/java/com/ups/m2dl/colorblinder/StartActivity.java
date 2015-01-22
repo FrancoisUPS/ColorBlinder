@@ -36,7 +36,7 @@ public class StartActivity extends ActionBarActivity {
     }
 
     public void takePhoto() {
-        String timestamp = String.valueOf(System.currentTimeMillis()/1000);
+        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
         String storageDirectory = BASE_PATH + timestamp + ".jpg";
 
         File photo = new File(Environment.getExternalStorageDirectory(), storageDirectory);
@@ -45,7 +45,7 @@ public class StartActivity extends ActionBarActivity {
         imageUri = Uri.fromFile(photo);
 
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
 
         startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
     }
@@ -56,10 +56,10 @@ public class StartActivity extends ActionBarActivity {
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
 
-                    Intent intent = new Intent(this, LineActivity.class);
-                    intent.putExtra(LineActivity.CST_IMGURI, imageUri);
+                Intent intent = new Intent(this, LineActivity.class);
+                intent.putExtra(LineActivity.CST_IMGURI, imageUri);
 
-                    startActivity(intent);
+                startActivity(intent);
             }
         }
     }

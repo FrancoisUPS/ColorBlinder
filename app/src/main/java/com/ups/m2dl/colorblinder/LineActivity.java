@@ -7,17 +7,20 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -29,11 +32,14 @@ public class LineActivity extends Activity {
     private float upx, upy, downx, downy;
     private Canvas lineCanvas;
 
+    private int[][] pixelsP1;
+    private int[][] pixelsP2;
+
     protected void drawImage() {
         getContentResolver().notifyChange(imageUri, null);
         ContentResolver cr = getContentResolver();
 
-        Bitmap bitmap;
+        final Bitmap bitmap;
 
         try {
 
@@ -58,6 +64,20 @@ public class LineActivity extends Activity {
                             upx = event.getX();
                             upy = event.getY();
                             lineCanvas.drawLine(downx, downy, upx, upy, paint);
+                            pixelsP1 = line((int) downx, (int) downy, (int) upx, (int) upy);
+
+
+                            for (int[] pixelCo : pixelsP1)
+                            {
+                                int pixel = bitmap.getPixel(pixelCo[0],pixelCo[1]);
+
+                                int redValue = Color.red(pixel);
+                                int blueValue = Color.blue(pixel);
+                                int greenValue = Color.green(pixel);
+
+                                
+                            }
+
                             ((ImageView) findViewById(R.id.imageView)).invalidate();
                             break;
                         case MotionEvent.ACTION_CANCEL:
@@ -69,8 +89,13 @@ public class LineActivity extends Activity {
                 }
             });
 
+            Display display = getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+
             //Create a new image bitmap and attach a brand new canvas to it
-            Bitmap tempBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.RGB_565);
+            Bitmap tempBitmap = Bitmap.createScaledBitmap(bitmap, size.x - 30, size.y - 30, false);
+
             lineCanvas = new Canvas(tempBitmap);
 
             //Draw the image b itmap into the cavas
@@ -123,12 +148,12 @@ public class LineActivity extends Activity {
 
         int numerator = longest >> 1;
 
-        int[][] pixels = new int[2][longest];
+        int[][] pixels = new int[longest][2];
 
         for (int i = 0; i <= longest; i++) {
 
-            pixels[0][i] = x;
-            pixels[1][i] = y;
+            pixels[i][0] = x;
+            pixels[i][1] = y;
 
             numerator += shortest;
             if (!(numerator < longest)) {
