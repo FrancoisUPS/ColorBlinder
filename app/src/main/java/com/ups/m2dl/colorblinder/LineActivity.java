@@ -12,17 +12,15 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.thirdparty.color.ColorDifference;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -56,7 +54,7 @@ public class LineActivity extends Activity {
                 public boolean onTouch(View v, MotionEvent event) {
                     int action = event.getAction();
                     Paint paint = new Paint();
-                    paint.setColor(Color.YELLOW);
+                    paint.setColor(Color.WHITE);
                     paint.setStrokeWidth(10);
                     switch (action) {
                         case MotionEvent.ACTION_DOWN:
@@ -72,12 +70,13 @@ public class LineActivity extends Activity {
                             pixelsP1 = line((int) downx, (int) downy, (int) upx, (int) upy);
 
                             ((ImageView) findViewById(R.id.imageView)).invalidate();
-                            
+
                             Set<Integer> colorsPassed = new HashSet<Integer>();
-                            for (int[] pixelCo : pixelsP1)
-                            {
-                                int pixel = bitmap.getPixel(pixelCo[0],pixelCo[1]);
-                                colorsPassed.add(pixel);
+                            for (int[] pixelCo : pixelsP1) {
+                                if (pixelCo[0] < bitmap.getWidth() && pixelCo[1] < bitmap.getWidth()) {
+                                    int pixel = bitmap.getPixel(pixelCo[0], pixelCo[1]);
+                                    colorsPassed.add(pixel);
+                                }
                             }
 
                             Toast.makeText(LineActivity.this, "You did " + colorsPassed.size(), Toast.LENGTH_LONG).show();
@@ -97,12 +96,12 @@ public class LineActivity extends Activity {
             display.getSize(size);
 
             //Create a new image bitmap and attach a brand new canvas to it
-            Bitmap tempBitmap = Bitmap.createScaledBitmap(bitmap, size.x - 30, size.y - 30, false);
+            Bitmap tempBitmap = Bitmap.createScaledBitmap(bitmap, size.x, size.y, true);
 
             lineCanvas = new Canvas(tempBitmap);
 
             //Draw the image b itmap into the cavas
-            lineCanvas.drawBitmap(bitmap, 0, 0, null);
+            lineCanvas.drawBitmap(tempBitmap, 0, 0, null);
 
             //Attach the canvas to the ImageView
             imgView.setImageDrawable(new BitmapDrawable(getResources(), tempBitmap));
@@ -115,6 +114,9 @@ public class LineActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_line);
 
         Intent intent = getIntent();
