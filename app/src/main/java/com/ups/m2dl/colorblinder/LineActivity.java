@@ -22,10 +22,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.thirdparty.color.ColorDifference;
+
 import java.io.IOException;
 
 
 public class LineActivity extends Activity {
+    static final double MAX_COLOR_DIFF = 6;
+    static final double SEUIL_COLOR_DIFF = 0.2;
 
     private Uri imageUri;
     public static final String CST_IMGURI = "uri";
@@ -40,7 +44,6 @@ public class LineActivity extends Activity {
         ContentResolver cr = getContentResolver();
 
         final Bitmap bitmap;
-
         try {
 
             bitmap = MediaStore.Images.Media.getBitmap(cr, imageUri);
@@ -66,17 +69,29 @@ public class LineActivity extends Activity {
                             lineCanvas.drawLine(downx, downy, upx, upy, paint);
                             pixelsP1 = line((int) downx, (int) downy, (int) upx, (int) upy);
 
-
+                            int nbColors = 0;
+                            int[] previousP = pixelsP1[0];
                             for (int[] pixelCo : pixelsP1)
                             {
                                 int pixel = bitmap.getPixel(pixelCo[0],pixelCo[1]);
+                                int previousPixel = bitmap.getPixel(previousP[0], previousP[1]);
 
                                 int redValue = Color.red(pixel);
                                 int blueValue = Color.blue(pixel);
                                 int greenValue = Color.green(pixel);
 
-                                
+                                int previousRedValue = Color.red(previousPixel);
+                                int previousBlueValue = Color.blue(previousPixel);
+                                int previousGreenValue = Color.green(previousPixel);
+
+                                double diff = ColorDifference.findDifference(previousRedValue, previousGreenValue, previousBlueValue, redValue, greenValue, blueValue);
+                                if(diff > SEUIL_COLOR_DIFF * MAX_COLOR_DIFF)
+                                    nbColors++;
+
+                                previousP = pixelCo;
                             }
+
+                            Toast.makeText(LineActivity.this, "You did " + nbColors, Toast.LENGTH_LONG).show();
 
                             ((ImageView) findViewById(R.id.imageView)).invalidate();
                             break;
@@ -150,7 +165,7 @@ public class LineActivity extends Activity {
 
         int[][] pixels = new int[longest][2];
 
-        for (int i = 0; i <= longest; i++) {
+        for (int i = 0; i < longest; i++) {
 
             pixels[i][0] = x;
             pixels[i][1] = y;
