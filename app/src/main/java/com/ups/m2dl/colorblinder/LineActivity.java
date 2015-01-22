@@ -38,6 +38,8 @@ public class LineActivity extends Activity {
     private int[][] pixelsP1;
     private int maxScore = 0;
     private MediaPlayer mp;
+    private int[] colors;
+    private int currentColor = 0;
 
     private static final String[] WIN_MESSAGE = {"Well, your %1$s is nothing near the amazing %2$s your friend has scored", "Not bad, but your %1$s still doesn't beat the best score of %2$s", "So close! You almost beat the best with a %1$s"};
 
@@ -82,7 +84,7 @@ public class LineActivity extends Activity {
                 public boolean onTouch(View v, MotionEvent event) {
                     int action = event.getAction();
                     Paint paint = new Paint();
-                    paint.setColor(Color.WHITE);
+                    paint.setColor(getCurrentColor());
                     paint.setStrokeWidth(10);
                     switch (action) {
                         case MotionEvent.ACTION_DOWN:
@@ -160,6 +162,15 @@ public class LineActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //Initiliaze string colors
+
+        colors = new int[5];
+        colors[0] = Color.rgb(42,222,117);
+        colors[1] = Color.rgb(255,251,25);
+        colors[2] = Color.rgb(247,126,195);
+        colors[3] = Color.rgb(82,53,99);
+        colors[4] = Color.rgb(36,111,145);
+
         mp = MediaPlayer.create(this, R.raw.background);
         mp.setLooping(true);
         mp.start();
@@ -182,6 +193,10 @@ public class LineActivity extends Activity {
         super.onResume();
 
         mp.start();
+    }
+
+    private int getCurrentColor() {
+        return colors[(int)Math.random() % colors.length];
     }
 
     //http://tech-algorithm.com/articles/drawing-line-using-bresenham-algorithm/
